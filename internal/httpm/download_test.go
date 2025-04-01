@@ -11,7 +11,7 @@ const (
 )
 
 func TestDownload(t *testing.T) {
-	resp, err := Download(testURL)
+	resp, err := DownloadToCache(testURL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +22,7 @@ func TestDownload(t *testing.T) {
 }
 
 func TestDownloadInvalidURL(t *testing.T) {
-	_, err := Download("I am not a url")
+	_, err := DownloadToCache("I am not a url")
 	if err != nil {
 		if errors.Is(err, ErrInvalidURL) {
 			return

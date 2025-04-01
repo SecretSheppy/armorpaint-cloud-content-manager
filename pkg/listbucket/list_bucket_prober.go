@@ -3,7 +3,7 @@ package listbucket
 import "github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/httpm"
 
 func ProbeOnce(URL string) (*ListBucketResult, error) {
-	raw, err := httpm.Download(URL)
+	raw, err := httpm.DownloadToCache(URL)
 	if err != nil {
 		return &ListBucketResult{}, err
 	}

@@ -11,7 +11,7 @@ var (
 	ErrFileDownloadFailed = errors.New("file download failed")
 )
 
-func Download(URL string) ([]byte, error) {
+func DownloadToCache(URL string) ([]byte, error) {
 	resp, err := http.Get(URL)
 	if err != nil {
 		return nil, ErrInvalidURL
