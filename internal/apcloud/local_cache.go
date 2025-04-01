@@ -1,5 +1,7 @@
 package apcloud
 
+import "path/filepath"
+
 type LocalCache struct {
 	Root      string
 	Materials string
@@ -8,10 +10,11 @@ type LocalCache struct {
 }
 
 func NewLocalCache(root string) *LocalCache {
+	root = filepath.Join(root, "apccm/")
 	return &LocalCache{
 		Root:      root,
-		Materials: "materials",
-		HDRI:      "hdri",
-		AssetList: "asset_list.json",
+		Materials: filepath.Join(root, "materials/"),
+		HDRI:      filepath.Join(root, "hdri/"),
+		AssetList: filepath.Join(root, "asset_list.json"),
 	}
 }

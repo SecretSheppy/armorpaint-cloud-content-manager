@@ -19,10 +19,10 @@ The `install` command installs all the cloud content into a specified directory 
 appended to the end. It also attempts to create a shortcut in the browser view of ArmorPaint
 to that location (though at time of writing this is only available on linux).
 
-The following example installs the content to `/your/install/location/apccm`
+The following example installs the content to `/your/install/location/apccm/`
 
 ```console
-apccm install /your/install/location
+apccm install /your/install/location/
 ```
 
 The `install` command also creates a `.assets_list.json` file in the installation directory.
@@ -36,7 +36,7 @@ The `update` command updates any out of date assets currently installed and down
 or new assets.
 
 ```console
-apccm update /your/install/location
+apccm update /your/install/location/
 ```
 
 ### `remove`
@@ -45,7 +45,7 @@ The `remove` command removes all assets from your local system. This is irrevers
 if you need to access the assets again you will have to install them all again.
 
 ```console
-apccm remove /your/install/location
+apccm remove /your/install/location/
 ```
 
 ## Build Instructions
