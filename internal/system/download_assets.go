@@ -33,33 +33,27 @@ func DownloadAllAssets(path string) {
 	}
 
 	for i, asset := range assets.Assets {
-		if files.GetPathState(asset.URL) == files.File {
-			parsedBaseURL, err := url.Parse(apcloud.BaseURL)
-			if err != nil {
-				log.Panic("failed to parse url")
-				panic(err)
-			}
-
-			parsedBaseURL.Path, err = url.JoinPath(parsedBaseURL.Path, asset.URL)
-			if err != nil {
-				log.Panic("failed to join url")
-				panic(err)
-			}
-
-			completeURL := parsedBaseURL.String()
-			filename := filepath.Base(asset.URL)
-
-			savePath := filepath.Join(cache.Materials, filename)
-			err = apcloud.DownloadAsset(completeURL, savePath)
-			if err != nil {
-				log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
-				panic(err)
-			}
-
-			log.Info(fmt.Sprintf("download progress (%d/%d) > downloaded %s", i, len(assets.Assets), asset.URL))
-		} else {
+		if files.GetPathState(asset.URL) != files.File {
 			log.Info(fmt.Sprintf("download progress (%d/%d) > skipping %s", i, len(assets.Assets), asset.URL))
+			continue
 		}
+
+		completeURL, err := url.JoinPath(apcloud.BaseURL, asset.URL)
+		if err != nil {
+			log.Panic("failed to join url")
+			panic(err)
+		}
+
+		filename := filepath.Base(asset.URL)
+		savePath := filepath.Join(cache.Materials, filename)
+
+		err = apcloud.DownloadAsset(completeURL, savePath)
+		if err != nil {
+			log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
+			panic(err)
+		}
+
+		log.Info(fmt.Sprintf("download progress (%d/%d) > downloaded %s", i, len(assets.Assets), asset.URL))
 	}
 
 	err = apcloud.SaveAssetList(assets, cache.AssetList)
