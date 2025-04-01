@@ -1,11 +1,8 @@
-package apcloud
+package listbucket
 
 import (
 	"encoding/xml"
-	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/httpm"
 )
-
-const cloudSourceURL = "https://armorpaint.fra1.digitaloceanspaces.com/"
 
 type Owner struct {
 	XMLName     xml.Name `xml:"Owner"`
@@ -43,13 +40,4 @@ func NewListBucketResult(raw []byte) (*ListBucketResult, error) {
 	}
 
 	return &list, nil
-}
-
-func ProbeOnce(URL string) (*ListBucketResult, error) {
-	raw, err := httpm.Download(URL)
-	if err != nil {
-		return &ListBucketResult{}, err
-	}
-
-	return NewListBucketResult(raw)
 }
