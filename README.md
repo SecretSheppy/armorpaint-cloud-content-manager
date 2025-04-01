@@ -47,3 +47,10 @@ if you need to access the assets again you will have to install them all again.
 ```console
 apccm remove /your/install/location
 ```
+
+## Build Instructions
+
+From the root directory of the repository
+
+* `go mod tidy`
+* `go build cmd/apccm/main.go`
