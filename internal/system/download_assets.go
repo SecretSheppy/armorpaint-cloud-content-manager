@@ -21,7 +21,6 @@ func DownloadAllAssets(path string) {
 	cache := apcloud.NewLocalCache(path)
 	makePath(cache.Root)
 	makePath(cache.Materials)
-	makePath(cache.HDRI)
 
 	log.Info("acquired local cache")
 
@@ -50,20 +49,11 @@ func DownloadAllAssets(path string) {
 			completeURL := parsedBaseURL.String()
 			filename := filepath.Base(asset.URL)
 
-			if filepath.Ext(asset.URL) == ".hdr" {
-				savePath := filepath.Join(cache.HDRI, filename)
-				err = apcloud.DownloadAsset(completeURL, savePath)
-				if err != nil {
-					log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
-					panic(err)
-				}
-			} else {
-				savePath := filepath.Join(cache.Materials, filename)
-				err = apcloud.DownloadAsset(completeURL, savePath)
-				if err != nil {
-					log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
-					panic(err)
-				}
+			savePath := filepath.Join(cache.Materials, filename)
+			err = apcloud.DownloadAsset(completeURL, savePath)
+			if err != nil {
+				log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
+				panic(err)
 			}
 
 			log.Info(fmt.Sprintf("download progress (%d/%d) > downloaded %s", i, len(assets.Assets), asset.URL))
