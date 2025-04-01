@@ -19,18 +19,17 @@ func DownloadAllAssets(path string) {
 		filepath.Join(path, "apccm")))
 
 	cache := apcloud.NewLocalCache(path)
+	log.Info("acquired local cache")
+
 	makePath(cache.Root)
 	makePath(cache.Materials)
-
-	log.Info("acquired local cache")
 
 	assets, err := apcloud.GetAssets()
 	if err != nil {
 		log.Panic("failed to get assets list")
 		panic(err)
-	} else {
-		log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
 	}
+	log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
 
 	for i, asset := range assets.Assets {
 		if files.GetPathState(asset.URL) != files.File {
