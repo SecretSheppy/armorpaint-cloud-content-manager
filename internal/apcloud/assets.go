@@ -2,6 +2,7 @@ package apcloud
 
 import (
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/data"
+	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/httpm"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/jsonutils"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/listbucket"
 )
@@ -62,4 +63,13 @@ func LoadAssetList(path string) (*AssetList, error) {
 	}
 
 	return &assets, nil
+}
+
+func DownloadAsset(url, path string) error {
+	err := httpm.DownloadToFile(url, path)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
