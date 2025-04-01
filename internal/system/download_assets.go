@@ -10,7 +10,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sync"
 )
+
+const numWorkers = 14
 
 var log = logger.Get()
 
@@ -31,29 +34,26 @@ func DownloadAllAssets(path string) {
 	}
 	log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
 
-	for i, asset := range assets.Assets {
-		if files.GetPathState(asset.URL) != files.File {
-			log.Info(fmt.Sprintf("download progress (%d/%d) > skipping %s", i, len(assets.Assets), asset.URL))
-			continue
-		}
+	jobs := make(chan DownloadJob)
 
-		completeURL, err := url.JoinPath(apcloud.BaseURL, asset.URL)
-		if err != nil {
-			log.Panic("failed to join url")
-			panic(err)
-		}
+	var wg sync.WaitGroup
 
-		filename := filepath.Base(asset.URL)
-		savePath := filepath.Join(cache.Materials, filename)
-
-		err = apcloud.DownloadAsset(completeURL, savePath)
-		if err != nil {
-			log.Panic(fmt.Sprintf("failed to download asset %s: %s", completeURL, err.Error()))
-			panic(err)
-		}
-
-		log.Info(fmt.Sprintf("download progress (%d/%d) > downloaded %s", i, len(assets.Assets), asset.URL))
+	for i := 1; i <= numWorkers; i++ {
+		wg.Add(1)
+		go downloadWorker(i, jobs, &wg)
 	}
+
+	go func() {
+		for _, asset := range assets.Assets {
+			if files.GetPathState(asset.URL) == files.File {
+				jobs <- NewDownloadJob(asset, *cache)
+			}
+		}
+
+		close(jobs)
+	}()
+
+	wg.Wait()
 
 	err = apcloud.SaveAssetList(assets, cache.AssetList)
 	if err != nil {
@@ -82,6 +82,41 @@ func makePath(path string) {
 		}
 	}
 	log.Info(fmt.Sprintf("acquired path %s", path))
+}
+
+type DownloadJob struct {
+	Asset apcloud.Asset
+	Cache apcloud.LocalCache
+}
+
+func NewDownloadJob(asset apcloud.Asset, cache apcloud.LocalCache) DownloadJob {
+	return DownloadJob{
+		Asset: asset,
+		Cache: cache,
+	}
+}
+
+func downloadWorker(ID int, jobs <-chan DownloadJob, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for job := range jobs {
+		URL, err := url.JoinPath(apcloud.BaseURL, job.Asset.URL)
+		if err != nil {
+			log.Panic(fmt.Sprintf("worker %d :: failed to join url", ID))
+			panic(err)
+		}
+
+		filename := filepath.Base(job.Asset.URL)
+		path := filepath.Join(job.Cache.Materials, filename)
+
+		err = apcloud.DownloadAsset(URL, path)
+		if err != nil {
+			log.Panic(fmt.Sprintf("worker %d :: failed to download asset %s", ID, URL))
+			panic(err)
+		}
+
+		log.Info(fmt.Sprintf("worker %d :: downloaded > %s", ID, URL))
+	}
 }
 
 func RemoveAllAssets(path string) {
