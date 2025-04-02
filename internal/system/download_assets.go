@@ -44,9 +44,9 @@ func downloadWorker(ID int, jobs <-chan DownloadJob, progress chan<- ProgressRep
 
 		err = apcloud.DownloadAsset(URL, path)
 		if err != nil {
-			progress <- NewProgressReport(ID, Error, job.Asset.URL)
+			progress <- NewProgressReport(ID, Error, path)
 		} else {
-			progress <- NewProgressReport(ID, Downloaded, job.Asset.URL)
+			progress <- NewProgressReport(ID, Downloaded, path)
 		}
 	}
 }
