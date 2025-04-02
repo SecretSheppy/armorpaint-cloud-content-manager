@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/apcloud"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/armorpaint"
-	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/logger"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/files"
 	"net/url"
 	"os"
@@ -14,8 +13,6 @@ import (
 )
 
 const numWorkers = 14
-
-var log = logger.Get()
 
 type DownloadJob struct {
 	Asset apcloud.Asset
@@ -88,13 +85,21 @@ func DownloadAllAssets(path string) {
 	makePath(cache.Root)
 	makePath(cache.Materials)
 
-	assets, err := apcloud.GetAssets()
-	if err != nil {
-		log.Panic("failed to get assets list")
-		panic(err)
-	}
-	log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
+	assets := getOnlineAssetsList()
+	workerPoolDownload(assets, cache)
+	saveLocalAssetList(assets, cache)
 
+	err := armorpaint.CreateBrowserShortcut(cache.Root)
+	if err != nil {
+		log.Warn("failed to create browser shortcut")
+	} else {
+		log.Info("created browser shortcut")
+	}
+
+	log.Info("cloud content installed successfully, restart ArmorPainter for quick access")
+}
+
+func workerPoolDownload(assets *apcloud.AssetList, cache *apcloud.LocalCache) {
 	jobs := make(chan DownloadJob)
 	progress := make(chan ProgressReport)
 
@@ -131,22 +136,6 @@ func DownloadAllAssets(path string) {
 	}()
 
 	wg.Wait()
-
-	err = apcloud.SaveAssetList(assets, cache.AssetList)
-	if err != nil {
-		log.Warn("failed to save asset list, updating will not work")
-	} else {
-		log.Info("saved asset list (.asset_list.json)")
-	}
-
-	err = armorpaint.CreateBrowserShortcut(cache.Root)
-	if err != nil {
-		log.Warn("failed to create browser shortcut")
-	} else {
-		log.Info("created browser shortcut")
-	}
-
-	log.Info("cloud content installed successfully, restart ArmorPainter for quick access")
 }
 
 func makePath(path string) {
@@ -164,10 +153,4 @@ func makePath(path string) {
 func RemoveAllAssets(path string) {
 	// TODO: use the .assets_list.json to only remove the assets and then remove
 	// 	the .assets_list.json
-}
-
-func UpdateAssetCache(path string) {
-	// cache := apcloud.NewLocalCache(path)
-
-	// assets, err := apcloud.LoadAssetList(cache.AssetList)
 }
