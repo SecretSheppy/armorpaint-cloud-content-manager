@@ -73,3 +73,11 @@ func DownloadAsset(url, path string) error {
 
 	return nil
 }
+
+func AssetListToMap(assets *AssetList) map[string]Asset {
+	result := make(map[string]Asset)
+	for _, asset := range assets.Assets {
+		result[asset.URL] = asset
+	}
+	return result
+}
