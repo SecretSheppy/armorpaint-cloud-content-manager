@@ -1,13 +1,11 @@
 package system
 
 import (
-	"errors"
 	"fmt"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/apcloud"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/armorpaint"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/files"
 	"net/url"
-	"os"
 	"path/filepath"
 	"sync"
 )
@@ -136,21 +134,4 @@ func workerPoolDownload(assets *apcloud.AssetList, cache *apcloud.LocalCache) {
 	}()
 
 	wg.Wait()
-}
-
-func makePath(path string) {
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		if errors.Is(err, os.ErrExist) {
-			log.Warn(fmt.Sprintf("path %s already exists, continuing...", path))
-		} else {
-			log.Panic(fmt.Sprintf("failed to create path %s", path))
-		}
-	}
-	log.Info(fmt.Sprintf("acquired path %s", path))
-}
-
-func RemoveAllAssets(path string) {
-	// TODO: use the .assets_list.json to only remove the assets and then remove
-	// 	the .assets_list.json
 }
