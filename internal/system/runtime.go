@@ -9,7 +9,7 @@ func Runtime(args []string) {
 	switch args[1] {
 	case "install":
 		DownloadAllAssets(args[2])
-	case "uninstall":
+	case "remove":
 		RemoveAllAssets(args[2])
 	case "update":
 		UpdateAssetCache(args[2])
