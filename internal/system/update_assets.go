@@ -3,7 +3,6 @@ package system
 import (
 	"fmt"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/apcloud"
-	"os"
 	"path/filepath"
 )
 
@@ -49,17 +48,4 @@ func UpdateAssetCache(path string) {
 	log.Info(fmt.Sprintf("updating %d assets", len(toGet.Assets)))
 	workerPoolDownload(assets, cache)
 	saveLocalAssetList(assets, cache)
-}
-
-func directoryExists(path string) (bool, error) {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-
-	if err != nil {
-		return false, err
-	}
-
-	return info.IsDir(), nil
 }
