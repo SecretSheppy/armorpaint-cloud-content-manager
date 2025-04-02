@@ -85,23 +85,11 @@ func DownloadAllAssets(path string) {
 	makePath(cache.Root)
 	makePath(cache.Materials)
 
-	assets, err := apcloud.GetAssets()
-	if err != nil {
-		log.Panic("failed to get assets list")
-		panic(err)
-	}
-	log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
-
+	assets := getOnlineAssetsList()
 	workerPoolDownload(assets, cache)
+	saveLocalAssetList(assets, cache)
 
-	err = apcloud.SaveAssetList(assets, cache.AssetList)
-	if err != nil {
-		log.Warn("failed to save asset list, updating will not work")
-	} else {
-		log.Info("saved asset list (.asset_list.json)")
-	}
-
-	err = armorpaint.CreateBrowserShortcut(cache.Root)
+	err := armorpaint.CreateBrowserShortcut(cache.Root)
 	if err != nil {
 		log.Warn("failed to create browser shortcut")
 	} else {
