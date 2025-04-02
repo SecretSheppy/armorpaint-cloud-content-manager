@@ -50,7 +50,18 @@ apccm remove /your/install/location/
 
 ## Build Instructions
 
-From the root directory of the repository
+### Prerequisites
 
-* `go mod tidy`
-* `go build cmd/apccm/main.go`
+* go [1.23+]
+
+### Build
+
+1. `git clone https://github.com/SecretSheppy/armorpaint-cloud-content-manager.git`
+2. `cd armorpaint-cloud-content-manager`
+3. `go mod tidy`
+4. `go build -o build/apccm cmd/apccm/main.go`
+
+### Build Usage
+
+1. `cd build`
+2. `./apccm install /your/location/here`
