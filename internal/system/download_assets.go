@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/apcloud"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/armorpaint"
-	"github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/logger"
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/files"
 	"net/url"
 	"os"
@@ -14,8 +13,6 @@ import (
 )
 
 const numWorkers = 14
-
-var log = logger.Get()
 
 type DownloadJob struct {
 	Asset apcloud.Asset
@@ -164,10 +161,4 @@ func makePath(path string) {
 func RemoveAllAssets(path string) {
 	// TODO: use the .assets_list.json to only remove the assets and then remove
 	// 	the .assets_list.json
-}
-
-func UpdateAssetCache(path string) {
-	// cache := apcloud.NewLocalCache(path)
-
-	// assets, err := apcloud.LoadAssetList(cache.AssetList)
 }

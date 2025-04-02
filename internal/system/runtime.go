@@ -2,9 +2,9 @@ package system
 
 import "github.com/SecretSheppy/armorpaint-cloud-content-manager/internal/logger"
 
-func Runtime(args []string) {
-	log := logger.Get()
+var log = logger.Get()
 
+func Runtime(args []string) {
 	if len(args) < 3 {
 		log.Panic("Not enough arguments")
 		panic("Not enough arguments")
