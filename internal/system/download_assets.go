@@ -92,6 +92,26 @@ func DownloadAllAssets(path string) {
 	}
 	log.Info(fmt.Sprintf("acquired %d assets from %s", len(assets.Assets), apcloud.BaseURL))
 
+	workerPoolDownload(assets, cache)
+
+	err = apcloud.SaveAssetList(assets, cache.AssetList)
+	if err != nil {
+		log.Warn("failed to save asset list, updating will not work")
+	} else {
+		log.Info("saved asset list (.asset_list.json)")
+	}
+
+	err = armorpaint.CreateBrowserShortcut(cache.Root)
+	if err != nil {
+		log.Warn("failed to create browser shortcut")
+	} else {
+		log.Info("created browser shortcut")
+	}
+
+	log.Info("cloud content installed successfully, restart ArmorPainter for quick access")
+}
+
+func workerPoolDownload(assets *apcloud.AssetList, cache *apcloud.LocalCache) {
 	jobs := make(chan DownloadJob)
 	progress := make(chan ProgressReport)
 
@@ -128,22 +148,6 @@ func DownloadAllAssets(path string) {
 	}()
 
 	wg.Wait()
-
-	err = apcloud.SaveAssetList(assets, cache.AssetList)
-	if err != nil {
-		log.Warn("failed to save asset list, updating will not work")
-	} else {
-		log.Info("saved asset list (.asset_list.json)")
-	}
-
-	err = armorpaint.CreateBrowserShortcut(cache.Root)
-	if err != nil {
-		log.Warn("failed to create browser shortcut")
-	} else {
-		log.Info("created browser shortcut")
-	}
-
-	log.Info("cloud content installed successfully, restart ArmorPainter for quick access")
 }
 
 func makePath(path string) {
