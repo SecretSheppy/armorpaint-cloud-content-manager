@@ -54,3 +54,28 @@ func saveLocalAssetList(assets *apcloud.AssetList, cache *apcloud.LocalCache) {
 		log.Info("saved asset list (.asset_list.json)")
 	}
 }
+
+func getLocalAssetList(cache *apcloud.LocalCache) *apcloud.AssetList {
+	installed, err := apcloud.LoadAssetList(cache.AssetList)
+	if err != nil {
+		log.Panic(fmt.Sprintf("failed to load local asset list %s", cache.AssetList))
+		panic(err)
+	}
+	log.Info(fmt.Sprintf("acquired local asset list, %d assets currently installed*", len(installed.Assets)))
+	log.Warn(fmt.Sprintf("    *local asset list includes skipped items, count inaccurate"))
+	return installed
+}
+
+func getValidLocalCache(path string) *apcloud.LocalCache {
+	cache := apcloud.NewLocalCache(path)
+	for _, p := range []string{cache.Root, cache.Materials} {
+		if exists, err := directoryExists(p); err != nil || !exists {
+			log.Panic(fmt.Sprintf("directory %s does not exist", p))
+			panic(err)
+		}
+
+		log.Info(fmt.Sprintf("aquired directory %s", p))
+	}
+	log.Info("acquired local cache")
+	return cache
+}
