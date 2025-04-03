@@ -7,10 +7,11 @@ import (
 	"github.com/SecretSheppy/armorpaint-cloud-content-manager/pkg/files"
 	"net/url"
 	"path/filepath"
+	"runtime"
 	"sync"
 )
 
-const numWorkers = 14
+var numWorkers = runtime.NumCPU()
 
 type DownloadJob struct {
 	Asset apcloud.Asset
